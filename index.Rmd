@@ -1,9 +1,9 @@
 ---
 title: "IODS course project"
-author: "Maiju Tanskanen"
+author: "Maiju Tanskanen lol"
 output:
   html_document:
-    theme: Cyborg
+    theme: cosmo
     toc: true
     toc_depth: 2
     fig_caption: true
