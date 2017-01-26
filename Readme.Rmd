@@ -1,4 +1,4 @@
-## More info
+## About this project
 
 The tools I am going to use in this course are:
   * R (Rstudio)
