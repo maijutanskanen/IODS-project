@@ -1,0 +1,6 @@
+## Introduction to Open Data Science
+
+On this course I will *hopefully* learn some basic tools and methods to do research with open data. 
+
+Here's a link to my Github repository: https://github.com/maijutanskanen/IODS-project
+
