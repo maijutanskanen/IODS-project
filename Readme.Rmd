@@ -1,0 +1,8 @@
+## More info
+
+The tools I am going to use in this course are:
+  * R (Rstudio)
+  * GitHub
+
+Here's a link to my course diary: 
+https://maijutanskanen.github.io/IODS-project/
