@@ -6,6 +6,8 @@ str(mydata)
 
 # it's a data with 183 observations and 60 variables
 
+install.packages("stargazer")
+install.packages("xtable")
 
 install.packages("dplyr")
 
@@ -87,12 +89,13 @@ p
 
 summary(analysis_data)
 
-# create a regression model with multiple explanatory variables
-my_model <- lm(Points ~ Attitude + Age + deep, data = analysis_data)
+# createting a regression model with multiple explanatory variables
+my_model1 <- lm(Points ~ Attitude + Age + deep, data = analysis_data)
 
-my_model <- lm(Points ~ Attitude, data = analysis_data)
+my_model2 <- lm(Points ~ Attitude, data = analysis_data)
 
-# print out a summary of the model
-summary(my_model)
+# printing out a summary of the model
+summary(my_model1)
+summary(my_model2)
 
-plot(my_model, which = c(1, 2, 5), par(mfrow = c(2,2)))
+plot(my_model2, which = c(1, 2, 5), par(mfrow = c(2,2)))

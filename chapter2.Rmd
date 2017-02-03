@@ -19,7 +19,7 @@ library(ggplot2)
 
 
 
-The data used in the analysis contains 166 cases and 7 variables. Variables “deep”, “stra”, and “surf” are combined variables indicating respondent’s learning strategies: deep, strategic and surface learning. “Attitude” indicates global attitude towards statistics, and “Points” indicates respondent’s exam points. In addition, age and gender are used as basic sociodemographic variables. Descriptive statistics of the data are displayed on the table above. There are considerably more females on the data: 110 vs. 56 males. As for learning strategies, the respondent’s tend to have slightly higher overall score on deep learning than other strategies. 
+The data used in the analysis contains 166 cases and 7 variables. Variables “deep”, “stra”, and “surf” are combined variables indicating respondent’s learning strategies: deep, strategic and surface learning. “Attitude” indicates global attitude towards statistics, and “Points” indicates respondent’s exam points. In addition, age and gender are used as basic sociodemographic variables. Descriptive statistics of the data are displayed on the table above. There are considerably more females on the data: 110 vs. 56 males. As for learning strategies, the respondents tend to have slightly higher overall score on deep learning than other strategies. 
 
 
 
