@@ -51,7 +51,7 @@ summary(my_model1)
 
 ## Fitted regression model
 
-In the fitted linear regression model, age and deep learning are removed from the analyses as non-significant. In this model, attitude remains statistically significant (p<0.001) beta-value being 3.52. The r-square value of 0.19 indicates that the model explains about 19 % of the variability of the dependent “points” variable. 
+In the fitted linear regression model, age and deep learning are removed from the analysis as non-significant. In this model, attitude remains statistically significant (p<0.001) beta-value being 3.52. The r-square value of 0.19 indicates that the model explains about 19 % of the variability of the dependent “points” variable. 
 
 ```{r}
 
@@ -60,7 +60,7 @@ summary(my_model2)
 ```
 
 
-The plots below can be interpreted to demonstrate how well the model fits the data. In the QQ-plot (down left), the points seem to follow the line quite well, which indicates that the errors of the model are quite normally distributed.  There does not seen to be any patterns on the scatter plot of fitted values and residuals, which indicates that the errors in the model have constant variance. The residuals vs. leverage plot there is no single observation standing out, which means that there are not observations having an unusually high impact. Based on these plots, the model seems to fit the data quite well. 
+The plots below can be interpreted to demonstrate how well the model fits the data. In the QQ-plot (down left), the points seem to follow the line quite well, which indicates that the errors of the model are quite normally distributed.  There does not seen to be any patterns on the scatter plot of fitted values and residuals, which indicates that the errors in the model have constant variance. In the residuals vs. leverage plot there is no single observation standing out, which means that there are no observations having an unusually high impact. Based on these plots, the model seems to fit the data quite well. 
 
 ```{r} 
 
