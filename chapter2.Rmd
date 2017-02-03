@@ -27,7 +27,7 @@ The data used in the analysis contains 166 cases and 7 variables. Variables “d
 summary(analysis_data)
 ```
 
-The plot above demonstrates the distributions of the variables and the relationships between them on males (blue) and females (red). As for exam points, attitude has the strongest correlation. Overall, there are minor differences on the distributions and relationships between genders but nothing outstanding. 
+The plot below demonstrates the distributions of the variables and the relationships between them on males (blue) and females (red). As for exam points, attitude has the strongest correlation. Overall, there are minor differences on the distributions and relationships between genders but nothing outstanding. 
 
 ```{r}
 p <- ggpairs(analysis_data, mapping = aes(col= gender, alpha = 0.3),
