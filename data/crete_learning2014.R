@@ -67,33 +67,3 @@ head(analysis_data)
 
 #everything ok for analysis
 
-#installing packages
-
-install.packages("ggplot2")
-install.packages("GGally")
-
-library(GGally)
-library(ggplot2)
-
-#plots and summaries
-
-pairs(analysis_data[-1], col = analysis_data$gender)
-
-
-p <- ggpairs(analysis_data, mapping = aes(col= gender, alpha = 0.3),
-lower = list(combo = wrap("facethist", bins = 20)))
-
-p
-
-summary(analysis_data)
-
-# createting a regression model with multiple explanatory variables
-my_model1 <- lm(Points ~ Attitude + Age + deep, data = analysis_data)
-
-my_model2 <- lm(Points ~ Attitude, data = analysis_data)
-
-# printing out a summary of the models
-summary(my_model1)
-summary(my_model2)
-
-plot(my_model2, which = c(1, 2, 5), par(mfrow = c(2,2)))
