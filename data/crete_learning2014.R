@@ -6,8 +6,6 @@ str(mydata)
 
 # it's a data with 183 observations and 60 variables
 
-install.packages("stargazer")
-install.packages("xtable")
 
 install.packages("dplyr")
 
@@ -94,7 +92,7 @@ my_model1 <- lm(Points ~ Attitude + Age + deep, data = analysis_data)
 
 my_model2 <- lm(Points ~ Attitude, data = analysis_data)
 
-# printing out a summary of the model
+# printing out a summary of the models
 summary(my_model1)
 summary(my_model2)
 
