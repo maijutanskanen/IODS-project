@@ -1,7 +1,70 @@
-# Insert chapter 2 title here
+# Regression and model validation
 
-*Describe the work you have done this week and summarize your learning.*
+*In this exercise, linear regression analysis is used to find out significant predictors of exam points of a statistics course exam.*
 
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using  
+```{r echo=FALSE}
+setwd("/Users/maijutanskanen/IODS-project 8.58.53/data")
+analysis_data <- read.table("learning2014.csv")
+
+```
+
+## Data
+
+
+```{r echo=FALSE, warning=FALSE}
+library(GGally)
+library(ggplot2)
+
+```
+
+
+
+The data used in the analysis contains 166 cases and 7 variables. Variables “deep”, “stra”, and “surf” are combined variables indicating respondent’s learning strategies: deep, strategic and surface learning. “Attitude” indicates global attitude towards statistics, and “Points” indicates respondent’s exam points. In addition, age and gender are used as basic sociodemographic variables. Descriptive statistics of the data are displayed on the table above. There are considerably more females on the data: 110 vs. 56 males. As for learning strategies, the respondent’s tend to have slightly higher overall score on deep learning than other strategies. 
+
+
+
+```{r}
+summary(analysis_data)
+```
+
+The plot above demonstrates the distributions of the variables and the relationships between them on males (blue) and females (red). As for exam points, attitude has the strongest correlation. Overall, there are minor differences on the distributions and relationships between genders but nothing outstanding. 
+
+```{r}
+p <- ggpairs(analysis_data, mapping = aes(col= gender, alpha = 0.3),
+lower = list(combo = wrap("facethist", bins = 20)))
+```
+
+```{r echo=FALSE}
+p
+```
+
+## Initial regression model
+
+Initially, linear regression model is built with three explanatory variables: attitude, age and deep learning.  The results of the analysis are displayed on the matrix below. Regarding the explanatory variables, only attitude is statistically significant (p<0.001) with beta-value of 3.59 indicating that increase of one unit of attitude increases the exam points by 3.59 in the model. 
+
+```{r}
+
+my_model1 <- lm(Points ~ Attitude + Age + deep, data = analysis_data)
+
+summary(my_model1)
+```
+
+## Fitted regression model
+
+In the fitted linear regression model, age and deep learning are removed from the analyses as non-significant. In this model, attitude remains statistically significant (p<0.001) beta-value being 3.52. The r-square value of 0.19 indicates that the model explains about 19 % of the variability of the dependent “points” variable. 
+
+```{r}
+
+my_model2 <- lm(Points ~ Attitude, data = analysis_data)
+summary(my_model2)
+```
+
+
+The plots below can be interpreted to demonstrate how well the model fits the data. In the QQ-plot (down left), the points seem to follow the line quite well, which indicates that the errors of the model are quite normally distributed.  There does not seen to be any patterns on the scatter plot of fitted values and residuals, which indicates that the errors in the model have constant variance. The residuals vs. leverage plot there is no single observation standing out, which means that there are not observations having an unusually high impact. Based on these plots, the model seems to fit the data quite well. 
+
+```{r} 
+
+plot(my_model2, which = c(1, 2, 5), par(mfrow = c(2,2)))
+
+```
+
