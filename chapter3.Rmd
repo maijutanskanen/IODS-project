@@ -1,0 +1,153 @@
+# Logistic regression
+
+In this exercise, logistic regression is used to define predictors of alcohol consumption among portuguese students.
+
+## Data
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(GGally)
+library(ggplot2)
+library(dplyr)
+
+```
+
+The data used in the analysis contains 382 observations and 35 variables related to family, freetime and school. The names of the variables are displayed in the matrix below. 
+
+```{r echo=FALSE}
+setwd("/Users/maijutanskanen/IODS-project 8.58.53/data")
+alc <- read.table("alcoholdata.csv", sep = ";", header = TRUE)
+```
+
+
+
+```{r}
+colnames(alc)
+```
+
+###Dependent variable
+Variable "high_use" indicating high achocol consumption will be used as the dependent variable in the analysis, and the plot below demonstrates its distribution. 
+
+```{r}
+counts <- table(alc$high_use)
+barplot(counts, main = "High use of alcohol")
+```
+
+###Predictors
+Below, high alcohol consumption is cross-tabulated with gender and relationship status (yes or no) which will be used as predictors.
+
+```{r}
+table1 <- table(alc$high_use, alc$sex)
+table1
+
+table2 <- table(alc$high_use, alc$romantic)
+table2
+```
+
+The barplots below display the distributions of the two other predictors, school absences and going out with friends.
+```{r}
+counts3 <- table(alc$absences)
+barplot(counts3, main = "Number of school absences")
+
+counts4 <- table(alc$goout)
+barplot(counts4, main = "Going out with friends 1 - very low  5 - very high")
+```
+
+The boxpot demonstrates the relationship between high achohol consumption and school absences grouped by gender.
+```{r}
+g1 <- ggplot(alc, aes(x = high_use, y = absences))
+g1 + geom_boxplot(aes(col = sex)) 
+```
+
+###Hypotheses
+
+Before the analysis, four hypotheses are made:
+_1) Male gender is a statistically significant predictor of high alcohol consumption._
+_2) Being in a relationship is a statistically significant predictor of high alcohol consumption._
+_3) Having a lot of school absences predicts high alcohol consumption on a statistically significant level._
+_4) Going out with friends a lot predicts high alcohol consumption on a statistically significant level._
+
+## Analysis
+
+###Initial analysis
+
+Initially, all the four predictors described above are used as predictors of high alcohol consumption in a logical regression model. 
+
+```{r}
+m <- glm(high_use ~  romantic + goout + sex + absences, data = alc, family = "binomial")
+summary(m)
+```
+
+The results show that relationship status is not a statistically significant predictor, and thus the second hypothesis is rejected as false. The variable is removed from the analysis and the model is fitted with three predictors: going out, gender and absences.
+
+###Fitted model
+
+```{r}
+m2 <- glm(high_use ~ goout + sex + absences, data = alc, family = "binomial")
+summary(m2)
+```
+
+In the second model, all the three predictors are statistically significant (p<0.001). The odd ratios (OR) below are interpreted to understand the results and to varify or falsify the three remaining hypotheses:
+
+1) The first hypothesis seems to be true: male gender is a statistically significant predictor of high alcohol consumption. Compared to females, males have a 2.61 times higher risk of high alcohol consumption.
+3) The third hypothesis is varified as well: having a lot of school absences predicts high alcohol consumption on a statistically significant level with an odd ratio of 1.09. This means, for example, that having ten more absences increases risk of high alcohol consumption by 2.32 times.
+4) Also, the fourth hypothesis is varified: going out with friends a lot predicts high alcohol consumption on a statistically significant level with an odd ratio of 2.07. Thus, those going out most (5) have a 18.5 times higher risk of high alcohol consumption compared to those who go out least (1).
+
+```{r message=FALSE}
+OR <- coef(m2) %>% exp
+
+CI <- confint(m2) %>% exp
+
+cbind(OR, CI)
+```
+
+## Testing the model
+
+The predictive power of the model is tested. With the code below, variable "probability", indicating the probability of high alcohol cosumption being true according to the model, and variable "prediction" indicating that according to the model there is more than a 50 % chance of high alcohol cosumption being true, are added to the data. 
+
+###Real values vs. predicted values
+
+The cross-tabulation matrix below shows that 302 of 382 observations in the data ( 79 %) are correctly classified. The plot below visualizes this.
+
+```{r}
+probabilities <- predict(m2, type = "response")
+
+alc <- mutate(alc, probability = probabilities)
+
+alc <- mutate(alc, prediction = (probability > 0.5))
+
+table(high_use = alc$high_use, prediction = alc$prediction)
+
+g <- ggplot(alc, aes(x = probability, y =high_use , col = prediction))
+g + geom_point()
+```
+
+### Classification error
+
+The result of using a loss function on the model shows that there is a 0.21 classification error in the model meaning that the model classifies uncorrectly 21 % of the cases. When guessing that there is a 0.4 chance for every observation in the data to have high alcohol consumption, the error is 30 %. Thus, the model works slightly better than a guess.
+
+```{r}
+
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+
+loss_func(class = alc$high_use, prob = alc$probability)
+```
+
+
+```{r}
+alc$guess <- 0.4
+loss_func(class = alc$high_use, prob = alc$guess)
+```
+
+###Cross-validation
+
+Finally, the model is tested with cross-validation. The 10-fold cross-validation of the model results in a 0.21 error. Thus, my model seems to be better than the one in DataCamp, woop.
+
+```{r}
+library(boot)
+cv <- cv.glm(data = alc, cost = loss_func, glmfit = m2, K = 10)
+
+cv$delta[1]
+```
+
