@@ -1,0 +1,145 @@
+# Clustering and classification
+
+In this exercise, linear discriminant analysis (LDA) and k-means clustering are used to classify data based on crime rate and to find clusters in the data.
+
+## Data
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(MASS)
+library(dplyr)
+library(ggplot2)
+library(GGally)
+library(tidyverse)
+library(corrplot)
+data("Boston")
+```
+
+The data used in this exercise is the Boston dataset from R's MASS package. The data contains information about housing in the area of Boston and it has 506 observations and 14 variables. The summaries of the variables are displayed in the matrix below and more information about the variables can be found [here](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html). 
+
+The correlation matrix demonstrates the relationships between the variables. Some of the variables have a clear positive or negative correlation, which seems obvious based on the nature of the variables. As for the summary matrix, it can be seen that the variables are very differently distributed compared to each other as different units of measurement are, of course, used.
+
+```{r}
+cor_matrix<-cor(Boston) 
+cor_matrix %>% round( digits=2) %>% corrplot(method="circle", type = "upper", cl.pos = "b", tl.pos = "d", tl.cex = 0.6)
+
+summary(Boston)
+```
+
+### Scaling the data
+
+For the purpose of later analysis, the whole data is standardized. As the summary matrix shows, the mean of every variable is now 0.
+
+```{r}
+boston_scaled <- scale(Boston)
+summary(boston_scaled)
+```
+
+```{r echo=FALSE} 
+boston_scaled <- as.data.frame(boston_scaled)
+```
+### Creating a categorical variable
+After scaling, the continuous "crim", indicating per capita crime rate by town, is recoded into four categories, and the original variable is replaced by the new categorical "crime" variable.
+```{r}
+scaled_crim <- boston_scaled$crim
+bins <- quantile(scaled_crim)
+crime <- cut(scaled_crim, breaks = bins, include.lowest = TRUE)
+crime <- factor(crime, labels = c("low", "med_low", "med_high", "high"))
+table(crime)
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+boston_scaled <- data.frame(boston_scaled, crime)
+```
+
+## Linear Discriminant Analysis
+
+### Creating train and test sets
+
+Before the analysis, a train set containing 80 % of the observations in the data and a test set with 20 % of the observations are created.
+
+```{r}
+n <- 506
+ind <- sample(n,  size = n * 0.8)
+train <- boston_scaled[ind,]
+test <- boston_scaled[-ind,]
+```
+
+### Analysis
+
+Linear discriminant analysis (LDA) is used to find the variables that separate the classes of the categorical "crime" variable. The results of the analysis are displayed below. 
+
+The first linear discriminant (LD1) explains 94.6 % of the between-group variance, and interestingly, the variable "rad" indicating accessibility to radial highways seems to have the greatest effect in that discriminant. Other than that, variables "nox" (nitrogen oxides concentration) and "zn" (proportion of residential land zoned for lots over 25,000 sq.ft.) have somewhat big effect on the discriminants.
+
+The plot below visualizes the results of the analysis.
+
+
+```{r}
+lda.fit <- lda(crime ~ ., data = train)
+lda.fit
+```
+
+```{r}
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+classes <- as.numeric(train$crime)
+
+plot(lda.fit, dimen = 2, col = classes, pch = classes)
+lda.arrows(lda.fit, myscale = 3)
+
+```
+
+### Testing the predictions
+
+The test set is used to test the predictions of the LDA model. The table below displays the actual and predicted classes of the "crime" variable. 75 out of 102 observations (73,5 %) are correctly classified by the model.
+
+```{r}
+correct_classes <- test$crime
+test <- dplyr::select(test, -crime)
+lda.pred <- predict(lda.fit, newdata = test)
+table(correct = correct_classes, predicted = lda.pred$class)
+```
+
+
+## Clustering by k-means
+
+The original Boston data (with the continuous "crim" variable) is scaled and the Euclidean distances between the observations are counted in order to use the k-means algorithm. After trying with a few different number of clusters, it seems like two clusters separate the data the best. The scatter plot matrix below demonstrates the clusters in two dimensions. It seems like at least variables "tax" and "rad" are clear separators.
+
+```{r echo=FALSE}
+data("Boston")
+```
+
+```{r}
+boston <- scale(Boston)
+boston <- as.data.frame(boston)
+dist_eu <- dist(boston)
+summary(dist_eu)
+km <-kmeans(dist_eu, centers = 2)
+pairs(Boston, col = km$cluster)
+```
+
+### LDA on clusters
+
+Finally, the k-means algorithm is used to form three clusters in order to run linear discriminant analysis using clusters as a target variable. The results can be seen below. In this model, variable "indus" (proportion of non-retail business acres per town) seems to have the biggest effect as a separator.
+
+```{r}
+km2 <-kmeans(dist_eu, centers = 3)
+lda.fit2 <- lda(km2$cluster ~ ., data = boston)
+lda.fit2
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+
+classes2 <- as.numeric(km2$cluster)
+
+plot(lda.fit2, dimen = 2, col = classes2, pch = classes2)
+lda.arrows(lda.fit2, myscale = 3)
+
+```
