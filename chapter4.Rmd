@@ -13,7 +13,7 @@ library(corrplot)
 data("Boston")
 ```
 
-The data used in this exercise is the Boston dataset from R's MASS package. The data contains information about housing in the area of Boston and it has 506 observations and 14 variables. The summaries of the variables are displayed in the matrix below and more information about the variables can be found [here](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html). 
+The data used in this exercise is the Boston dataset from R's MASS package. The data contains information about housing in the area of Boston and it has 506 observations and 14 variables. The summaries of the variables are displayed in the matrix below and more information about them can be found [here](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html). 
 
 The correlation matrix demonstrates the relationships between the variables. Some of the variables have a clear positive or negative correlation, which seems obvious based on the nature of the variables. As for the summary matrix, it can be seen that the variables are very differently distributed compared to each other as different units of measurement are, of course, used.
 
