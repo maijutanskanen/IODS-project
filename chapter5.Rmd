@@ -1,0 +1,135 @@
+# Dimensionality reduction techniques
+
+In this exercise, dimensionality reduction techniques are used to find components and connections in two different datasets and in that way reduce number of dimensions in them.
+
+## Principal component analysis (PCA)
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(MASS)
+library(dplyr)
+library(ggplot2)
+library(GGally)
+library(tidyverse)
+library(corrplot)
+library(stringr)
+library(FactoMineR)
+setwd("/Users/maijutanskanen/IODS-project 8.58.53/data")
+human <- read.csv(file = "human.csv", sep = ";", header = TRUE)
+```
+### Data
+
+The "human" dataset contains different indicators of human development and gender inequality. In the modified dataset used in the PCA exercise, there are 155 observations (countries) and the following 8 variables: 
+
+"eduratio": famale/male ratio of population with secondary education 
+
+"labourratio": female/male ratio of labour force participation 
+
+"life": life expectancy at birth 
+
+"expedu": expected years of education
+
+"gni": gross national income (GNI) per capita
+
+"matmort": maternal mortality ratio
+
+"adobirth": adolescent birth rate
+
+“parliament”: % of seats in parliament held by women
+
+The summaries of the variables are displayed in the matrix below, and the plot below visualizes the distributions of the variables and displays the correlations between them. There are some rather big and quite obvious positive/negative correlations between some of the variables; for example, life expectancy correlates negatively with maternal mortality whereas expected years of education has a positive correlation with it. 
+
+```{r}
+summary(human)
+ggpairs(human)
+```
+
+### Analysis
+
+_Non-standardized data_
+
+At first, principal component analysis is run on the non-standardized data. The results of the analysis can be seen below.
+
+```{r, warning=FALSE, message=FALSE}
+pca_human <- prcomp(human)
+pca_human
+s <- summary(pca_human)
+pca_pr <- round(100*s$importance[2, ], digits = 1)
+
+
+
+paste0(names(pca_pr), " (", pca_pr, "%)")
+pc_lab <-paste0(names(pca_pr), " (", pca_pr, "%)")
+biplot(pca_human, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
+```
+
+The first component (PC1) that is highly impacted by gross national income (GNI) per capita captures all the variance in the data when PCA is run using non-standardized data. So, the results can be interpreted as GNI explaining all the differences in human development and gender inequality between countries.
+
+
+_Standardized data_
+
+As PCA gives more importance to variables with large variance, the data is standardized to run PCA again in order to get more plausible results.
+
+```{r}
+human_std <- scale(human)
+summary(human_std)
+```
+
+The results of the second analysis can be seen below.
+
+
+```{r, warning=FALSE, message=FALSE}
+
+pca_human2 <- prcomp(human_std)
+pca_human2
+
+s2 <- summary(pca_human2)
+
+pca_pr2 <- round(100*s2$importance[2, ], digits = 1)
+
+
+
+paste0(names(pca_pr2), " (", pca_pr2, "%)")
+pc_lab2 <-paste0(names(pca_pr2), " (", pca_pr2, "%)")
+
+
+biplot(pca_human2, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab2[1], ylab = pc_lab2[2])
+```
+
+Due to scaling, the results of the second analysis are quite different from the first one in which variable “gni” had a great importance because of its large scale compared to the other variables. In the second analysis, the variables have more equal loadings.
+
+The first component (PC1) captures 53.6 % of the variance in the data. As the plot above shows, this component is highly loaded with variables indicating life expectancy, maternal mortality, adolescent birth rate, expected years of education and education ratio between genders. As for the second component (PC2), which captures 16.2 % of the variance, percentage of women in parliament and ratio of women to men in labour force have the greatest impact. 
+
+So, one could sum up that the first component is related to health and educational conditions whereas the second one is more about distribution of societal power between genders, and those two are the most influential in explaining the differences in human development and gender inequality between countries. Interestingly, GNI does not have that much importance in the results of this analysis. 
+
+
+## Multiple correspondence analysis (MCA)
+
+### Data
+
+The data used in MCA exercise is the “the” dataset in R’s FactoMineR package, and it contains 300 observations and variables related to tea drinking habits. Out of the 36 variables in the original dataset, six are used in this exercise. The distributions of those are displayed in the summary matrix and the bar blot below. 
+
+```{r, warning=FALSE, message=FALSE}
+data("tea")
+keep_columns <- c("sugar", "sex", "breakfast", "friends", "healthy", "feminine")
+tea_time <- dplyr::select(tea, one_of(keep_columns))
+
+summary(tea_time)
+
+gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar()
+```
+
+### Analysis
+
+Multiple correspondence analysis is run on the “tea_time” dataset with six variables. The results of the analysis can are displayed below, and the biplot visualizes the results.  
+
+
+```{r}
+mca <- MCA(tea_time, graph = FALSE)
+summary(mca)
+plot(mca, invisible=c("ind"), habillage = "quali")
+```
+
+
+The first two dimensions produced by MCA capture 24.7 % and 19.5 % of the variance in the data. The first dimension is most highly linked to variables “sex”, “feminine” and “sugar” whereas the second dimension is linked to variables “breakfast”, “healthy” and “friends”. 
+
+As for the biplot, it shows for example that being male and not considering tea drinking feminine are somewhat close to each other whereas drinking tea with breakfast and without friends are close to each other as well considering tea drinking healthy and drinking it without sugar (meanings of the variables are assumed as I could not find descriptions of them anywhere). 
+
